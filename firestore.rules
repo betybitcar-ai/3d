@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // CAMBIÁ ESTE EMAIL por el tuyo (el mismo de ADMIN_EMAIL en js/config.js)
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == "tu-email@gmail.com";
+    }
+
+    match /orders/{id} {
+      allow create: if request.auth != null
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.st == "Nuevo"
+                    && request.resource.data.n is string && request.resource.data.n.size() < 100
+                    && request.resource.data.c is string && request.resource.data.c.size() < 100
+                    && request.resource.data.r.size() < 2000;
+      // quien tiene el link (el id del pedido) puede abrirlo
+      allow get: if request.auth != null;
+      // listar: el jefe ve todos, cada cliente solo los suyos
+      allow list: if isAdmin() || (request.auth != null && resource.data.uid == request.auth.uid);
+      allow update: if isAdmin() || (request.auth != null
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lm', 'lb']));
+      allow delete: if isAdmin();
+
+      match /msgs/{mid} {
+        allow read: if request.auth != null;
+        allow create: if request.auth != null
+                      && request.resource.data.from == request.auth.uid
+                      && request.resource.data.boss == isAdmin()
+                      && request.resource.data.text.size() < 1000;
+        allow delete: if isAdmin();
+      }
+    }
+
+    match /catalog/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

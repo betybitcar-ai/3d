@@ -1,0 +1,63 @@
+ALEOM 3D - CÓMO PONERLO EN MARCHA
+=================================
+
+ARCHIVOS
+- index.html          La página (estructura).
+- css/styles.css      Todo el diseño (colores, tarjetas, modo oscuro).
+- js/config.js        LO ÚNICO QUE TENÉS QUE EDITAR: WhatsApp, precios,
+                      materiales, datos de Firebase, tu email de jefe, galería.
+- js/data.js          Servicios y catálogo de modelos (agregá o quitá aquí).
+- js/app.js           Arranque. El resto de js/ es la lógica (pedidos, chat, admin).
+- fotos/              Poné acá las fotos de tus trabajos (y cargalas en config.js).
+- firestore.rules     Reglas de seguridad de la base de datos.
+- vercel.json         Ajustes para Vercel (no hace falta tocarlo).
+- favicon.svg         Ícono de la pestaña.
+
+IMPORTANTE: la página usa módulos de JavaScript, así que NO se abre con doble clic
+sobre index.html. Para probar en tu compu usá la extensión "Live Server" de VS Code
+(o: npx serve). Subida a Vercel/Netlify/GitHub Pages funciona normal.
+
+SIN CONFIGURAR NADA la página ya funciona: servicios, catálogo, cotizador y
+pedidos por WhatsApp. Los pasos de abajo activan los pedidos guardados, el chat
+y el panel del jefe. Es gratis (plan Spark de Firebase).
+
+PASO 1 - Crear el proyecto
+1. Entrá a https://console.firebase.google.com con tu cuenta de Google.
+2. "Agregar proyecto" -> ponele ALEOM 3D -> podés desactivar Google Analytics.
+3. En la pantalla del proyecto tocá el ícono web </> ("Agregar app web").
+   Ponele un nombre y registrala. Te muestra un bloque "firebaseConfig".
+
+PASO 2 - Pegar la configuración
+Abrí js/config.js y completá FIREBASE con los datos de firebaseConfig
+(apiKey, authDomain, projectId, appId). En ADMIN_EMAIL poné tu email de jefe.
+
+PASO 3 - Activar el ingreso
+1. Menú Build -> Authentication -> "Comenzar".
+2. Pestaña "Sign-in method": activá "Anónimo" y "Correo electrónico/contraseña".
+3. Pestaña "Users" -> "Agregar usuario": poné TU email (el mismo de ADMIN_EMAIL)
+   y una contraseña. Hacé esto antes de publicar la página.
+
+PASO 4 - Crear la base de datos
+1. Build -> Firestore Database -> "Crear base de datos" (modo producción).
+2. Pestaña "Reglas": borrá lo que hay, pegá el contenido de firestore.rules,
+   CAMBIÁ "tu-email@gmail.com" por tu email y tocá "Publicar".
+
+PASO 5 - Subir la página a Vercel
+1. Subí esta carpeta completa (con index.html en la raíz) a un repositorio de
+   GitHub, o usá la terminal: npm i -g vercel  ->  vercel  ->  vercel --prod
+2. En Vercel: Add New -> Project -> importá el repo. Framework: "Other".
+   No hace falta comando de build ni carpeta de salida. Deploy.
+3. En Firebase: Authentication -> Settings -> "Dominios autorizados" ->
+   agregá el dominio de Vercel (por ejemplo aleom3d.vercel.app).
+   Sin esto los pedidos no se guardan.
+
+CÓMO SE USA
+- Cliente: hace el pedido en "Hacer un pedido". Se abre su pedido con un link
+  para seguirlo y chatear. Ese link también sirve desde otro dispositivo.
+- Jefe: entrá a tudominio/#admin (o al enlace "Acceso del taller" al pie),
+  con tu email y contraseña. Ves todos los pedidos, cambiás estado, precio
+  final y fecha de entrega, chateás con el cliente y agregás modelos al
+  catálogo (con foto por URL opcional).
+
+Para probar en tu compu agregá "localhost" y "127.0.0.1" a los dominios
+autorizados de Firebase.
